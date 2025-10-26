@@ -1,5 +1,5 @@
 // ===================================
-// WhiffCulture - Professional JS with Carousel
+// WhiffCulture - Professional JS with Carousel & Fixed Hamburger
 // ===================================
 
 // Carousel functionality
@@ -10,11 +10,8 @@ const totalSlides = slides.length;
 let carouselInterval;
 
 function showSlide(index) {
-    // Remove active class from all slides and indicators
     slides.forEach(slide => slide.classList.remove('active'));
     indicators.forEach(indicator => indicator.classList.remove('active'));
-    
-    // Add active class to current slide and indicator
     slides[index].classList.add('active');
     indicators[index].classList.add('active');
 }
@@ -30,7 +27,7 @@ function prevSlide() {
 }
 
 function startCarousel() {
-    carouselInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+    carouselInterval = setInterval(nextSlide, 5000);
 }
 
 function stopCarousel() {
@@ -43,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showSlide(currentSlide);
         startCarousel();
         
-        // Pause carousel on hover
         const carouselContainer = document.querySelector('.hero-carousel');
         if (carouselContainer) {
             carouselContainer.addEventListener('mouseenter', stopCarousel);
@@ -103,22 +99,42 @@ window.addEventListener('scroll', () => {
     const scrollTop = document.getElementById('scrollTop');
     
     if (window.scrollY > 100) {
-        navbar.classList.add('scrolled');
-        scrollTop.classList.add('visible');
+        if (navbar) navbar.classList.add('scrolled');
+        if (scrollTop) scrollTop.classList.add('visible');
     } else {
-        navbar.classList.remove('scrolled');
-        scrollTop.classList.remove('visible');
+        if (navbar) navbar.classList.remove('scrolled');
+        if (scrollTop) scrollTop.classList.remove('visible');
     }
 });
 
-// Mobile menu toggle
+// ===================================
+// ENHANCED MOBILE HAMBURGER MENU - FIXED
+// ===================================
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
+const body = document.body;
 
 if (hamburger && navMenu) {
-    hamburger.addEventListener('click', () => {
-        navMenu.classList.toggle('show');
-        hamburger.classList.toggle('active');
+    // Toggle menu on hamburger click
+    hamburger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const isOpen = navMenu.classList.contains('show');
+        
+        if (isOpen) {
+            // Close menu
+            navMenu.classList.remove('show');
+            hamburger.classList.remove('active');
+            body.style.overflow = '';
+        } else {
+            // Open menu
+            navMenu.classList.add('show');
+            hamburger.classList.add('active');
+            body.style.overflow = 'hidden';
+        }
+        
+        console.log('Menu toggled:', !isOpen ? 'OPEN' : 'CLOSED');
     });
 
     // Close menu when clicking on a link
@@ -126,7 +142,28 @@ if (hamburger && navMenu) {
         link.addEventListener('click', () => {
             navMenu.classList.remove('show');
             hamburger.classList.remove('active');
+            body.style.overflow = '';
         });
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (navMenu.classList.contains('show')) {
+            if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+                navMenu.classList.remove('show');
+                hamburger.classList.remove('active');
+                body.style.overflow = '';
+            }
+        }
+    });
+    
+    // Close menu on ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navMenu.classList.contains('show')) {
+            navMenu.classList.remove('show');
+            hamburger.classList.remove('active');
+            body.style.overflow = '';
+        }
     });
 }
 
@@ -149,7 +186,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             e.preventDefault();
             const target = document.querySelector(href);
             if (target) {
-                const navHeight = document.getElementById('navbar').offsetHeight;
+                const navbar = document.getElementById('navbar');
+                const navHeight = navbar ? navbar.offsetHeight : 90;
                 const targetPosition = target.offsetTop - navHeight;
                 
                 window.scrollTo({
@@ -256,8 +294,8 @@ function showNotification(message) {
         bottom: 30px;
         left: 50%;
         transform: translateX(-50%) translateY(100px);
-        background: linear-gradient(135deg, var(--luxury-gold), var(--dark-gold));
-        color: var(--primary-black);
+        background: linear-gradient(135deg, #d4af37, #b8960f);
+        color: #000000;
         padding: 16px 35px;
         border-radius: 0;
         font-size: 13px;
@@ -325,4 +363,7 @@ if (userIcon) {
     });
 }
 
+// Debug: Log when script loads
 console.log('WhiffCulture - Professional perfume store with carousel initialized');
+console.log('Hamburger element:', hamburger);
+console.log('Nav menu element:', navMenu);
